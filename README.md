@@ -3,6 +3,26 @@ vlsub
 
 VLC extension to download subtitles from opensubtitles.org
 
+### Web demo
+
+This repository now includes a lightweight browser-based UI that mirrors the VLSub workflow:
+
+* Choose a local video file.
+* Search OpenSubtitles by hash or filename.
+* Download the subtitle you want.
+
+Open `index.html` in your browser, add your OpenSubtitles API key, and start searching.
+
+> Why do I need my own API key?
+> The VLC extension uses OpenSubtitles' legacy API (and sometimes a bundled user agent)
+> that does not require an explicit API key. The web UI calls the current OpenSubtitles
+> REST API from the browser, which requires a personal API key for authentication.
+
+> Can we use the legacy API instead?
+> Not directly from a static browser app. The legacy API is XML-RPC and does not send
+> CORS headers, so browsers block it. To use it on the web, you would need a small
+> server-side proxy that performs the XML-RPC calls and returns JSON to the browser.
+
 
 Author: Guillaume Le Maout  
 Contact: http://addons.videolan.org/messages/?action=newmessage&username=exebetche  
