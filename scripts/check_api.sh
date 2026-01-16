@@ -5,6 +5,7 @@ API_BASE="https://api.opensubtitles.com/api/v1"
 API_KEY="${OPENSUBTITLES_API_KEY:-Er4Y8GbS7JoCcLf9oJmjc2noj2wIsrNu}"
 QUERY="${OPENSUBTITLES_QUERY:-inception}"
 LANGUAGE="${OPENSUBTITLES_LANGUAGE:-en}"
+USER_AGENT="${OPENSUBTITLES_USER_AGENT:-VLSubWebDemo/1.0}"
 
 response_headers="$(mktemp)"
 response_body="$(mktemp)"
@@ -19,6 +20,8 @@ set +e
 status="$(curl -sS -D "$response_headers" -o "$response_body" \
   -H "Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
+  -A "${USER_AGENT}" \
+  -L \
   "${API_BASE}/subtitles?query=${QUERY}&languages=${LANGUAGE}" \
   -w "%{http_code}" 2>"$response_error")"
 curl_exit=$?
