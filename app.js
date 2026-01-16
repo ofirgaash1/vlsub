@@ -9,6 +9,7 @@ const resultsEl = document.getElementById("results");
 const HASH_CHUNK_SIZE = 64 * 1024;
 const API_BASE = "https://api.opensubtitles.com/api/v1";
 const DEFAULT_API_KEY = "Er4Y8GbS7JoCcLf9oJmjc2noj2wIsrNu";
+const API_CONSUMER_NAME = "ofir gaash v1.0";
 
 const formatBytes = (bytes) => {
   if (!bytes) return "0 B";
@@ -91,6 +92,7 @@ const computeHash = async (file) => {
 const buildHeaders = () => ({
   "Api-Key": apiKeyInput.value.trim(),
   "Content-Type": "application/json",
+  "X-User-Agent": API_CONSUMER_NAME,
 });
 
 const describeResponse = async (response) => {
