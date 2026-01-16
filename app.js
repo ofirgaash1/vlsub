@@ -9,7 +9,6 @@ const resultsEl = document.getElementById("results");
 const HASH_CHUNK_SIZE = 64 * 1024;
 const API_BASE = "https://api.opensubtitles.com/api/v1";
 const DEFAULT_API_KEY = "Er4Y8GbS7JoCcLf9oJmjc2noj2wIsrNu";
-const USER_AGENT = "VLSubWebDemo/1.0";
 
 const formatBytes = (bytes) => {
   if (!bytes) return "0 B";
@@ -23,9 +22,28 @@ const formatBytes = (bytes) => {
   return `${size.toFixed(1)} ${units[index]}`;
 };
 
-const setStatus = (message, tone = "neutral") => {
-  statusEl.textContent = message;
+const setStatus = (message, tone = "neutral", details = "") => {
   statusEl.dataset.tone = tone;
+  if (!details) {
+    statusEl.textContent = message;
+    return;
+  }
+
+  statusEl.innerHTML = "";
+  const summary = document.createElement("div");
+  summary.textContent = message;
+
+  const detailEl = document.createElement("details");
+  detailEl.open = true;
+
+  const summaryEl = document.createElement("summary");
+  summaryEl.textContent = "Show details";
+
+  const pre = document.createElement("pre");
+  pre.textContent = details;
+
+  detailEl.append(summaryEl, pre);
+  statusEl.append(summary, detailEl);
 };
 
 const clearResults = () => {
@@ -73,8 +91,33 @@ const computeHash = async (file) => {
 const buildHeaders = () => ({
   "Api-Key": apiKeyInput.value.trim(),
   "Content-Type": "application/json",
-  "User-Agent": USER_AGENT,
 });
+
+const describeResponse = async (response) => {
+  let bodyText = "";
+  try {
+    bodyText = await response.text();
+  } catch (error) {
+    bodyText = `Unable to read response body: ${error.message}`;
+  }
+
+  const requestId =
+    response.headers.get("x-kong-request-id") ||
+    response.headers.get("x-request-id") ||
+    response.headers.get("x-amzn-requestid");
+  const retryAfter = response.headers.get("retry-after");
+  const contentType = response.headers.get("content-type");
+
+  const lines = [
+    `Status: ${response.status} ${response.statusText}`.trim(),
+    requestId ? `Request ID: ${requestId}` : null,
+    retryAfter ? `Retry-After: ${retryAfter}` : null,
+    contentType ? `Content-Type: ${contentType}` : null,
+    bodyText ? `Body: ${bodyText.slice(0, 800)}` : null,
+  ].filter(Boolean);
+
+  return lines.join("\n");
+};
 
 const renderResults = (items) => {
   if (!items.length) {
@@ -128,7 +171,8 @@ const renderResults = (items) => {
           body: JSON.stringify({ file_id: fileInfo.file_id }),
         });
         if (!response.ok) {
-          throw new Error(`Download request failed (${response.status})`);
+          const details = await describeResponse(response);
+          throw new Error(`Download request failed.\n${details}`);
         }
         const payload = await response.json();
         const link = document.createElement("a");
@@ -141,7 +185,9 @@ const renderResults = (items) => {
         downloadButton.remove();
         setStatus("Download link ready.", "success");
       } catch (error) {
-        setStatus(error.message, "error");
+        const message = error.message || "Download request failed.";
+        const [summary, ...rest] = message.split("\n");
+        setStatus(summary, "error", rest.join("\n"));
         downloadButton.disabled = false;
         downloadButton.textContent = "Get download link";
       }
@@ -169,13 +215,16 @@ const searchSubtitles = async (params) => {
 
     const response = await fetch(url, { headers: buildHeaders() });
     if (!response.ok) {
-      throw new Error(`Search failed (${response.status})`);
+      const details = await describeResponse(response);
+      throw new Error(`Search failed.\n${details}`);
     }
     const payload = await response.json();
     renderResults(payload.data ?? []);
     setStatus(`Found ${payload.total_count ?? payload.data?.length ?? 0} subtitle(s).`, "success");
   } catch (error) {
-    setStatus(error.message, "error");
+    const message = error.message || "Search failed.";
+    const [summary, ...rest] = message.split("\n");
+    setStatus(summary, "error", rest.join("\n"));
     clearResults();
   } finally {
     searchHashButton.disabled = false;

@@ -123,6 +123,27 @@ button.ghost {
   color: var(--muted);
 }
 
+.status details {
+  margin-top: 8px;
+}
+
+.status summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.status pre {
+  margin: 8px 0 0;
+  padding: 12px;
+  background: #f0f2f8;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #1c2233;
+}
+
 .results {
   display: grid;
   gap: 16px;
