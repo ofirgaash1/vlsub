@@ -8,6 +8,7 @@ const resultsEl = document.getElementById("results");
 
 const HASH_CHUNK_SIZE = 64 * 1024;
 const API_BASE = "https://api.opensubtitles.com/api/v1";
+const DEFAULT_API_KEY = "Er4Y8GbS7JoCcLf9oJmjc2noj2wIsrNu";
 
 const formatBytes = (bytes) => {
   if (!bytes) return "0 B";
@@ -214,3 +215,5 @@ fileInput.addEventListener("change", () => {
 });
 
 clearResults();
+
+apiKeyInput.value = DEFAULT_API_KEY;
