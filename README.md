@@ -3,6 +3,16 @@ vlsub
 
 VLC extension to download subtitles from opensubtitles.org
 
+### Web demo
+
+This repository now includes a lightweight browser-based UI that mirrors the VLSub workflow:
+
+* Choose a local video file.
+* Search OpenSubtitles by hash or filename.
+* Download the subtitle you want.
+
+Open `index.html` in your browser, add your OpenSubtitles API key, and start searching.
+
 
 Author: Guillaume Le Maout  
 Contact: http://addons.videolan.org/messages/?action=newmessage&username=exebetche  
